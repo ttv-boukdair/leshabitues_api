@@ -10,50 +10,64 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[ApiResource(attributes: ['normalization_context' => ['groups' => ['read']],'denormalization_context' => ['groups' => ['write']]])]
+
+#[ApiResource(
+    attributes: ['normalization_context' => ['groups' => ['read']],'denormalization_context' => ['groups' => ['write']]],
+    collectionOperations: [
+        'get',
+        'post',
+    ],
+    itemOperations: [
+        'get',
+        'patch',
+    ],
+)]
+
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["user"=>"read"])]
+     #[Groups(['read', 'write'])]
     private $id;
   
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Groups(["user"=>"read", "user"=>"write"])]
+    #[Groups(['read', 'write'])]
     private $email;
 
     #[ORM\Column(type: 'json')]
-    #[Groups(["user"=>"read", "user"=>"write"])]
+     #[Groups(['read', 'write'])]
     private $roles = [];
 
     #[ORM\Column(type: 'string')]
     private $password;
 
     #[Groups([ "user"=>"write"])]
+    #[SerializedName("password")]
     private $plainPassword;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["user"=>"read", "user"=>"write"])]
+     #[Groups(['read', 'write'])]
     private $nom;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["user"=>"read", "user"=>"write"])]
+     #[Groups(['read', 'write'])]
     private $prenom;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(["user"=>"read", "user"=>"write"])]
+     #[Groups(['read', 'write'])]
     private $adresse;
 
     #[ORM\Column(type: 'integer', length: 255, nullable: true)]
-    #[Groups(["user"=>"read", "user"=>"write"])]
+     #[Groups(['read', 'write'])]
     private $codePostal;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["user"=>"read", "user"=>"write"])]
+     #[Groups(['read', 'write'])]
     private $ville;
 
     // #[ORM\OneToMany(mappedBy: 'commercant', targetEntity: Offre::class, orphanRemoval: true)]
@@ -102,7 +116,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        $roles[] = 'client';
 
         return array_unique($roles);
     }
@@ -128,6 +142,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    public function getPlainPassword( ): string
+    {
+        return $this->plainPassword ;
+    }
+
+    public function setPlainPassword (string $plainPassword ): self
+    {
+        $this->plainPassword = $plainPassword ;
+
+        return $this;
+    }
 
     /**
      * @see UserInterface
@@ -135,7 +160,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        $this->plainPassword = null;
     }
 
     public function getNom(): ?string
