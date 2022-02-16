@@ -4,8 +4,9 @@ namespace App\Entity;
 
 use App\Repository\PortefeuilleRepository;
 use Doctrine\ORM\Mapping as ORM;
-
+use ApiPlatform\Core\Annotation\ApiResource;
 #[ORM\Entity(repositoryClass: PortefeuilleRepository::class)]
+#[ApiResource]
 class Portefeuille
 {
     #[ORM\Id]

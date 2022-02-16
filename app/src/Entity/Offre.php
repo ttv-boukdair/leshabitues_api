@@ -21,8 +21,7 @@ class Offre
     #[ORM\Column(type: 'integer')]
     private $remise;
 
-    #[ORM\Column(type: 'boolean')]
-    private $active;
+
 
     #[ORM\Column(type: 'boolean')]
     private $isPublished;
@@ -66,17 +65,7 @@ class Offre
         return $this;
     }
 
-    public function getActive(): ?bool
-    {
-        return $this->active;
-    }
 
-    public function setActive(bool $active): self
-    {
-        $this->active = $active;
-
-        return $this;
-    }
 
     public function getIsPublished(): ?bool
     {

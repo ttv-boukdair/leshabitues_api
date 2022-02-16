@@ -8,38 +8,52 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+#[ApiResource(attributes: ['normalization_context' => ['groups' => ['read']],'denormalization_context' => ['groups' => ['write']]])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["user"=>"read"])]
     private $id;
+  
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Groups(["user"=>"read", "user"=>"write"])]
     private $email;
 
     #[ORM\Column(type: 'json')]
+    #[Groups(["user"=>"read", "user"=>"write"])]
     private $roles = [];
 
     #[ORM\Column(type: 'string')]
     private $password;
 
+    #[Groups([ "user"=>"write"])]
+    private $plainPassword;
+
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(["user"=>"read", "user"=>"write"])]
     private $nom;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(["user"=>"read", "user"=>"write"])]
     private $prenom;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(["user"=>"read", "user"=>"write"])]
     private $adresse;
 
     #[ORM\Column(type: 'integer', length: 255, nullable: true)]
+    #[Groups(["user"=>"read", "user"=>"write"])]
     private $codePostal;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(["user"=>"read", "user"=>"write"])]
     private $ville;
 
     // #[ORM\OneToMany(mappedBy: 'commercant', targetEntity: Offre::class, orphanRemoval: true)]
