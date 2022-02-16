@@ -17,14 +17,18 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 #[ApiResource(
     attributes: ['normalization_context' => ['groups' => ['read']],'denormalization_context' => ['groups' => ['write']]],
     collectionOperations: [
-        'get',
+        // 'get',
+        'get'=>["security"=>"is_granted('ROLE_ADMIN')"],
+        //register new user
         'post',
     ],
     itemOperations: [
-        'get',
-        'patch',
+        'get'=>["security"=>"is_granted('show', object)"],    
+        'patch'=>["security"=>"is_granted('edit', object)"],    
     ],
 )]
+
+
 
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -116,7 +120,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        $roles[] = 'ROLE_CLIENT';
 
         return array_unique($roles);
     }
@@ -127,7 +131,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
+    public function hasRoles(string $roles): bool
+    {
+        return in_array($roles, $this->roles);
+    }
     /**
      * @see PasswordAuthenticatedUserInterface
      */
@@ -142,7 +149,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-    public function getPlainPassword( ): string
+    public function getPlainPassword( ): ?string
     {
         return $this->plainPassword ;
     }

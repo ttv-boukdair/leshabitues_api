@@ -178,6 +178,9 @@
     "psr/log": {
         "version": "3.0.0"
     },
+    "scienta/doctrine-json-functions": {
+        "version": "5.0.0"
+    },
     "symfony/asset": {
         "version": "v6.0.3"
     },

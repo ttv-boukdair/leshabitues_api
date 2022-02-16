@@ -6,6 +6,7 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User;
+use App\Entity\Offre;
 class AppFixtures extends Fixture
 {
     private UserPasswordHasherInterface $hasher;
@@ -19,7 +20,8 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $this->generateUsers(5,$manager);
-
+        $manager->flush();
+        $this->generateOffres($manager);
         $manager->flush();
     }
 
@@ -69,5 +71,44 @@ class AppFixtures extends Fixture
             $manager->persist($user);
         }
 
+    }
+
+
+    function generateOffres(ObjectManager $manager)
+    {
+
+
+        //  find commercant
+        $user= new User();
+        $commercants= $manager->getRepository("App:User")->findByRole("ROLE_COMMERCANT");
+
+        for ($i = 0; $i <  count($commercants); $i++) {
+        $offre= new Offre();
+        $offre->setCommercant($commercants[$i]);
+        $offre->setMontant(50);
+        $offre->setRemise(1.5);
+        $offre->setIsPublished(true);
+        $offre->setPublishedAt(new \DateTimeImmutable());
+        $offre->setUpdatedAt(new \DateTimeImmutable());
+        $manager->persist($offre);
+
+        $offre= new Offre();
+        $offre->setCommercant($commercants[$i]);
+        $offre->setMontant(100);
+        $offre->setRemise(5);
+        $offre->setIsPublished(true);
+        $offre->setPublishedAt(new \DateTimeImmutable());
+        $offre->setUpdatedAt(new \DateTimeImmutable());
+        $manager->persist($offre);
+
+        $offre= new Offre();
+        $offre->setCommercant($commercants[$i]);
+        $offre->setMontant(150);
+        $offre->setRemise(15);
+        $offre->setIsPublished(true);
+        $offre->setPublishedAt(new \DateTimeImmutable());
+        $offre->setUpdatedAt(new \DateTimeImmutable());
+        $manager->persist($offre);
+        }
     }
 }

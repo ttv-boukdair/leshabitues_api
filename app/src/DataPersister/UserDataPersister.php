@@ -38,6 +38,8 @@ class UserDataPersister implements ContextAwareDataPersisterInterface
      */
     public function persist($data, array $context = []):void
     {
+
+        //crypt use password
         if ($data->getPlainPassword()) {
 
             $hashedPassword =  $this->_passwordHasher->hashPassword(

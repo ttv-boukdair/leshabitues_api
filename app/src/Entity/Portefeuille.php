@@ -6,6 +6,11 @@ use App\Repository\PortefeuilleRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 #[ORM\Entity(repositoryClass: PortefeuilleRepository::class)]
+#[UniqueEntity(
+    fields: ['commercant', 'client'],
+    errorPath: 'client',
+    message: "ce client a déjà un portefeuill chez ce commerçant",
+)]
 #[ApiResource]
 class Portefeuille
 {

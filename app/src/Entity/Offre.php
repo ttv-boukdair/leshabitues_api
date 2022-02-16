@@ -1,13 +1,27 @@
 <?php
 
 namespace App\Entity;
-
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\OffreRepository;
 use Doctrine\ORM\Mapping as ORM;
-
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Entity(repositoryClass: OffreRepository::class)]
-#[ApiResource]
+
+#[ApiResource(
+    collectionOperations: [
+        'get',
+        'post'=>["security"=>"is_granted('ROLE_COMMERCANT')"],
+    ],
+    itemOperations: [
+        'get',    
+        'patch'=>["security"=>"is_granted('edit', object)"],    
+    ],
+)]
+
+#[ApiFilter(SearchFilter::class, properties: [ 'commercant' => 'exact', 'isPublished' => 'exact'])]
 class Offre
 {
     #[ORM\Id]
@@ -18,7 +32,7 @@ class Offre
     #[ORM\Column(type: 'integer')]
     private $montant;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'float')]
     private $remise;
 
 
@@ -32,7 +46,7 @@ class Offre
     #[ORM\Column(type: 'datetime_immutable')]
     private $updatedAt;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'offres')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     private $commercant;
 
@@ -53,12 +67,12 @@ class Offre
         return $this;
     }
 
-    public function getRemise(): ?int
+    public function getRemise(): ?float
     {
         return $this->remise;
     }
 
-    public function setRemise(int $remise): self
+    public function setRemise(float $remise): self
     {
         $this->remise = $remise;
 
@@ -114,4 +128,19 @@ class Offre
 
         return $this;
     }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+
+
+
+        // UniqueEntity validation
+        $metadata->addConstraint(new UniqueEntity([
+            'fields'=> ['commercant', 'montant'],
+            'errorPath'=>  'montant',
+            'message'=>  "Cette offre existe déjà pour ce commerçant",
+        ]));
+   
+    }
+ 
 }
