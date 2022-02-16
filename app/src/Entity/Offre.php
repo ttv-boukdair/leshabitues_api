@@ -33,6 +33,10 @@ class Offre
     #[ORM\Column(type: 'datetime_immutable')]
     private $updatedAt;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'offres')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $commercant;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -106,6 +110,18 @@ class Offre
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCommercant(): ?User
+    {
+        return $this->commercant;
+    }
+
+    public function setCommercant(?User $commercant): self
+    {
+        $this->commercant = $commercant;
 
         return $this;
     }

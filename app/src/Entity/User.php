@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -39,6 +41,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $ville;
+
+    // #[ORM\OneToMany(mappedBy: 'commercant', targetEntity: Offre::class, orphanRemoval: true)]
+    // private $offres;
+
+    // #[ORM\OneToMany(mappedBy: 'commercant', targetEntity: Portefeuille::class)]
+    // private $portefeuillesClients;
+
+    public function __construct()
+    {
+        // $this->offres = new ArrayCollection();
+        // $this->portefeuillesClients = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -169,4 +183,64 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    // /**
+    //  * @return Collection|Offre[]
+    //  */
+    // public function getOffres(): Collection
+    // {
+    //     return $this->offres;
+    // }
+
+    // public function addOffre(Offre $offre): self
+    // {
+    //     if (!$this->offres->contains($offre)) {
+    //         $this->offres[] = $offre;
+    //         $offre->setCommercant($this);
+    //     }
+
+    //     return $this;
+    // }
+
+    // public function removeOffre(Offre $offre): self
+    // {
+    //     if ($this->offres->removeElement($offre)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($offre->getCommercant() === $this) {
+    //             $offre->setCommercant(null);
+    //         }
+    //     }
+
+    //     return $this;
+    // }
+
+    // /**
+    //  * @return Collection|Portefeuille[]
+    //  */
+    // public function getPortefeuillesClients(): Collection
+    // {
+    //     return $this->portefeuillesClients;
+    // }
+
+    // public function addPortefeuillesClient(Portefeuille $portefeuillesClient): self
+    // {
+    //     if (!$this->portefeuillesClients->contains($portefeuillesClient)) {
+    //         $this->portefeuillesClients[] = $portefeuillesClient;
+    //         $portefeuillesClient->setCommercant($this);
+    //     }
+
+    //     return $this;
+    // }
+
+    // public function removePortefeuillesClient(Portefeuille $portefeuillesClient): self
+    // {
+    //     if ($this->portefeuillesClients->removeElement($portefeuillesClient)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($portefeuillesClient->getCommercant() === $this) {
+    //             $portefeuillesClient->setCommercant(null);
+    //         }
+    //     }
+
+    //     return $this;
+    // }
 }
