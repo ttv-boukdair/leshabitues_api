@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use ApiPlatform\Core\Annotation\ApiProperty;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 
@@ -45,6 +46,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'json')]
      #[Groups(['read', 'write'])]
+       #[ApiProperty(
+        attributes: [
+            "openapi_context" => [
+                "type" => "array",
+                "enum" => ["ROLE_CLIENT", "ROLE_COMMERCANT","ROLE_ADMIN"],
+                "example" => ["ROLE_CLIENT"],
+            ],
+        ],
+    )]
     private $roles = [];
 
     #[ORM\Column(type: 'string')]

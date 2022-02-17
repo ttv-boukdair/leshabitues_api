@@ -9,16 +9,19 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiProperty;
 #[ORM\Entity(repositoryClass: OffreRepository::class)]
 
 #[ApiResource(
+    attributes: ['denormalization_context' => ['groups' => ['offre_write']]],
     collectionOperations: [
         'get',
         'post'=>["security"=>"is_granted('ROLE_COMMERCANT')"],
     ],
     itemOperations: [
         'get',    
-        'patch'=>["security"=>"is_granted('edit', object)"],    
+        'patch'=>["security"=>"is_granted('edit', object)"],  
     ],
 )]
 #[ApiFilter(OrderFilter::class, properties: ['id' => 'ASC', 'montant' => 'DESC'])]
@@ -31,14 +34,17 @@ class Offre
     private $id;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['offre_write'])]
     private $montant;
 
     #[ORM\Column(type: 'float')]
+       #[Groups(['offre_write'])]
     private $remise;
 
 
 
     #[ORM\Column(type: 'boolean')]
+       #[Groups(['offre_write'])]
     private $isPublished;
 
     #[ORM\Column(type: 'datetime_immutable')]
@@ -49,6 +55,14 @@ class Offre
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
+       #[ApiProperty(
+        attributes: [
+            "openapi_context" => [
+                "type" => "string",
+                "example" => "/api/users/1",
+            ],
+        ],
+    )]
     private $commercant;
 
     public function getId(): ?int

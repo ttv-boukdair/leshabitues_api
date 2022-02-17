@@ -3,7 +3,7 @@
 
 namespace App\DataPersister;
 
-use App\Entity\Offre;
+use App\Entity\Portefeuille;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -65,7 +65,7 @@ class PortefeuilleDataPersister implements ContextAwareDataPersisterInterface
                
             }
 
-          // update  Portefeuille: add updated date
+          // update offer: add updated date
             if ($this->_request->getMethod() !== 'POST') {
                 $data->setUpdatedAt(new \DateTimeImmutable());
             }

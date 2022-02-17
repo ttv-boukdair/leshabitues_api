@@ -122,7 +122,7 @@ class TransactionDataPersister implements ContextAwareDataPersisterInterface
         //update portefeuille object
         $portefeuille=$transaction->getPortefeuille();
         $portefeuille->setSolde($portefeuille->getSolde()+ $montant);
-
+        $portefeuille->setUpdatedAt(new \DateTimeImmutable());
 
         // suspend auto-commit
         $this->_entityManager->getConnection()->beginTransaction();
@@ -141,19 +141,27 @@ class TransactionDataPersister implements ContextAwareDataPersisterInterface
     }
     private function Debit(Transaction $transaction, User $user):void
     {
+
+       
+        //init solde and montant vars
         $portefeuille=$transaction->getPortefeuille();
         $solde=$transaction->getPortefeuille()->getSolde();
         $montant=$transaction->getMontant();
 
+
+
+        //check if solde positive
         if($montant > $solde  ) throw new InvalidArgumentException(self::ERROR_SOLDE_MSG_INSUFFICIENT);
 
+        // update solde in portefeuille
+        $portefeuille->setSolde( $solde-$montant);
+        $portefeuille->setUpdatedAt(new \DateTimeImmutable());
 
 
         // suspend auto-commit
         $this->_entityManager->getConnection()->beginTransaction();
         try {
-            // update solde in portefeuille
-            $portefeuille->setSolde( $solde-$montant);
+           
             $this->_entityManager->persist($transaction);
             $this->_entityManager->persist($portefeuille);
             $this->_entityManager->flush();

@@ -12,10 +12,13 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Annotation\ApiProperty;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 
 #[ApiResource(
+    attributes: ['denormalization_context' => ['groups' => ['transaction_write']]],
     collectionOperations: [
         'get',
         'post'=>["security"=>"is_granted('ROLE_CLIENT')"],
@@ -39,23 +42,63 @@ class Transaction
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[Groups(['transaction_write'])]
     #[ORM\Column(type: 'string', length: 255)]
+        #[ApiProperty(
+            attributes: [
+                "openapi_context" => [
+                    "type" => "string",
+                    "enum" => ["credit", "debit"],
+                    "example" => "credit",
+                ],
+            ],
+        )]
     private $type;
 
-    #[ORM\Column(type: 'float')]
+   #[Groups(['transaction_write'])]
+   #[ORM\Column(type: 'float')]
+     #[ApiProperty(
+        attributes: [
+            "openapi_context" => [
+                "type" => "float",
+                "example" => "10.5", 
+                "summary"=>"le champ montant est pris en compte en cas de transaction de type debit"
+            ],
+        ],
+    )]
     private $montant;
 
+    #[Groups(['transaction_write'])]
     #[ORM\ManyToOne(targetEntity: Offre::class)]
+    #[ApiProperty(
+        attributes: [
+            "openapi_context" => [
+                "type" => "string",
+                "example" => "/api/offres/1",
+                "summary"=>"le champ offre est pris en compte en cas de transaction de type credit"
+            ],
+        ],
+    )]      
     private $offre;
 
-    #[ORM\ManyToOne(targetEntity: Portefeuille::class, inversedBy: 'transactions')]
+    #[Groups(['transaction_write'])]
+    #[ORM\ManyToOne(targetEntity: Portefeuille::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[ApiProperty(
+        attributes: [
+            "openapi_context" => [
+                "type" => "string",
+                "example" => "/api/portefeuilles/1",
+            ],
+        ],
+    )]    
     private $portefeuille;
-        #[ORM\Column(type: 'datetime_immutable')]
-        private $publishedAt;
 
-        #[ORM\Column(type: 'datetime_immutable')]
-        private $updatedAt;
+    #[ORM\Column(type: 'datetime_immutable')]
+    private $publishedAt;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    private $updatedAt;
 
     public function getId(): ?int
     {
@@ -135,4 +178,5 @@ class Transaction
 
         return $this;
     }
+
 }

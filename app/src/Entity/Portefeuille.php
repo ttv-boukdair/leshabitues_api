@@ -13,9 +13,12 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiProperty;
 #[ORM\Entity(repositoryClass: PortefeuilleRepository::class)]
 
 #[ApiResource(
+    attributes: ['denormalization_context' => ['groups' => ['portefeuille_write']]],
     collectionOperations: [
         'get',
         'post'=>["security"=>"is_granted('ROLE_CLIENT')"],
@@ -39,6 +42,15 @@ class Portefeuille
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['portefeuille_write'])]
+    #[ApiProperty(
+            attributes: [
+                "openapi_context" => [
+                    "type" => "string",
+                    "example" => "/api/users/1",
+                ],
+            ],
+        )]
     private $commercant;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -46,17 +58,18 @@ class Portefeuille
     private $client;
 
     #[ORM\Column(type: 'datetime_immutable')]
+ 
     private $publishedAt;
 
     #[ORM\Column(type: 'datetime_immutable')]
+
     private $updatedAt;
 
-    #[ORM\OneToMany(mappedBy: 'portefeuille', targetEntity: Transaction::class)]
-    private $transactions;
+
 
     public function __construct()
     {
-        $this->transactions = new ArrayCollection();
+      
     }
 
     public function getId(): ?int
@@ -134,41 +147,7 @@ class Portefeuille
             'message'=>  'ce client a déjà un portefeuill chez ce commerçant',
         ]));
 
-            // // UniqueEntity validation
-            // $metadata->addConstraint(new PositiveOrZero([
-            //     'fields'=> 'solde',
-            //     'message'=>  "Il n'est pas possible d'avoir un solde négatif",
-            // ]));
-   
-    }
-
-    /**
-     * @return Collection|Transaction[]
-     */
-    public function getTransactions(): Collection
-    {
-        return $this->transactions;
-    }
-
-    public function addTransaction(Transaction $transaction): self
-    {
-        if (!$this->transactions->contains($transaction)) {
-            $this->transactions[] = $transaction;
-            $transaction->setPortefeuille($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTransaction(Transaction $transaction): self
-    {
-        if ($this->transactions->removeElement($transaction)) {
-            // set the owning side to null (unless already changed)
-            if ($transaction->getPortefeuille() === $this) {
-                $transaction->setPortefeuille(null);
-            }
-        }
-
-        return $this;
     }
 }
+
+  
