@@ -4,13 +4,14 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Entity\Portefeuille;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 
 
 
-class UserVoter extends Voter
+class PortefeuilleVoter extends Voter
 {
     const EDIT = 'edit';
     const VIEW= 'view';
@@ -28,7 +29,7 @@ class UserVoter extends Voter
             return false;
         }
 
-        if (!$subject instanceof User) {
+        if (!$subject instanceof Portefeuille) {
             return false;
         }
 
@@ -48,17 +49,41 @@ class UserVoter extends Voter
         $subject,
         TokenInterface $token
     ): bool {
+
         $user = $token->getUser();
 
         if (!$user instanceof User) {
+            // the user must be logged in; if not, deny access
             return false;
         }
 
-        /**
-         * @var User
+      /**
+         * @var Portefeuille
          */
-        $user_row= $subject;
+        $portefeuille= $subject;
 
-        return  $user->hasRoles('ROLE_ADMIN') || $user->getEmail() === $user_row->getEmail();
+
+        switch ($attribute) {
+            case self::VIEW:
+                return $this->canView( $portefeuille, $user);
+            case self::EDIT:
+                return $this->canEdit( $portefeuille, $user);
+        }
+
+        throw new \LogicException('This code should not be reached!');
+    
+       
+        return  $user->hasRoles('ROLE_ADMIN') || $user === $portefeuille->getClient();
+    }
+
+
+    private function canView(Portefeuille $portefeuille, User $user): bool
+    {
+        return  $user->hasRoles('ROLE_ADMIN') || $user === $portefeuille->getClient();
+    }
+    private function canEdit(Post $post, User $user): bool
+    {
+        
+        return $user->hasRoles('ROLE_ADMIN') ;
     }
 }

@@ -18,7 +18,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         'post'=>["security"=>"is_granted('ROLE_CLIENT')"],
     ],
     itemOperations: [
-        'get'=>["security"=>"is_granted('show', object)"],     
+        'get'=>["security"=>"is_granted('view', object)"],     
     ],
 )]
 #[ApiFilter(OrderFilter::class, properties: ['id' => 'ASC','solde' =>'DESC'])]
@@ -33,7 +33,7 @@ class Portefeuille
     #[ORM\Column(type: 'integer')]
     private $solde;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'portefeuillesClients')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     private $commercant;
 

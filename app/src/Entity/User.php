@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
         'post',
     ],
     itemOperations: [
-        'get'=>["security"=>"is_granted('show', object)"],    
+        'get'=>["security"=>"is_granted('view', object)"],    
         'patch'=>["security"=>"is_granted('edit', object)"],    
     ],
 )]
