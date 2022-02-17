@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 #[ORM\Entity(repositoryClass: OffreRepository::class)]
 
 #[ApiResource(
@@ -20,7 +21,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         'patch'=>["security"=>"is_granted('edit', object)"],    
     ],
 )]
-
+#[ApiFilter(OrderFilter::class, properties: ['id' => 'ASC', 'montant' => 'DESC'])]
 #[ApiFilter(SearchFilter::class, properties: [ 'commercant' => 'exact', 'isPublished' => 'exact'])]
 class Offre
 {
