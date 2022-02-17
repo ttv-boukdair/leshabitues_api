@@ -28,6 +28,9 @@ class TransactionDataPersister implements ContextAwareDataPersisterInterface
     const ERROR_OFFER_MSG_NOT_PUBLISHED="L'offre n'est plus active";
     const ERROR_PORTEFEUILLE_MSG_EMPTY="Il faut choisir un Portefeuille";
     const ERROR_PORTEFEUILLE_MSG_ACCESS_DENIED="Accès refusé à ce Portefeuille";
+    const ERROR_DB_MSG_TRANSACTION="Erreur de sauvegarde de la transaction";
+    const ERROR_MONTANT_MSG_INCORRECT="Montant incorrect";
+    const ERROR_SOLDE_MSG_INSUFFICIENT="Solde insuffisant";
     private $_entityManager;
     private $_request;
     private $_security;
@@ -70,6 +73,10 @@ class TransactionDataPersister implements ContextAwareDataPersisterInterface
        // return 404 if portefeuille is not owned by the currente user or user with role Admin
        if($user!==$data->getPortefeuille()->getClient() )  throw new InvalidArgumentException(self::ERROR_PORTEFEUILLE_MSG_ACCESS_DENIED);
     
+       // tracking dates
+       $data->setPublishedAt(new \DateTimeImmutable());
+       $data->setUpdatedAt(new \DateTimeImmutable());
+
        switch ($type) {
         case self::CREDIT:
             $this->Credit( $data, $user);
@@ -111,10 +118,9 @@ class TransactionDataPersister implements ContextAwareDataPersisterInterface
         // update transaction object 
         $montant=$offre->getMontantAvecRemise();
         $transaction->setMontant($montant);
-        $transaction->setPublishedAt(new \DateTimeImmutable());
-        $transaction->setUpdatedAt(new \DateTimeImmutable());
+
         //update portefeuille object
-        $portefeuille=$data->getPortefeuille();
+        $portefeuille=$transaction->getPortefeuille();
         $portefeuille->setSolde($portefeuille->getSolde()+ $montant);
 
 
@@ -126,18 +132,37 @@ class TransactionDataPersister implements ContextAwareDataPersisterInterface
          $this->_entityManager->flush();
          $this->_entityManager->getConnection()->commit();
         } catch (Exception $e) {
-                // rollback 
+            // rollback 
             $this->_entityManager->getConnection()->rollBack();
-            throw $e;
+            throw new ServiceException(ERROR_DB_MSG_TRANSACTION);
         }
 
         
     }
     private function Debit(Transaction $transaction, User $user):void
     {
+        $portefeuille=$transaction->getPortefeuille();
+        $solde=$transaction->getPortefeuille()->getSolde();
+        $montant=$transaction->getMontant();
 
-        $this->_entityManager->persist($transaction);
-        $this->_entityManager->flush();
-        throw new \LogicException(self::ERROR_LOGIC);
+        if($montant > $solde  ) throw new InvalidArgumentException(self::ERROR_SOLDE_MSG_INSUFFICIENT);
+
+
+
+        // suspend auto-commit
+        $this->_entityManager->getConnection()->beginTransaction();
+        try {
+            // update solde in portefeuille
+            $portefeuille->setSolde( $solde-$montant);
+            $this->_entityManager->persist($transaction);
+            $this->_entityManager->persist($portefeuille);
+            $this->_entityManager->flush();
+            $this->_entityManager->getConnection()->commit();
+        } catch (Exception $e) {
+            // rollback 
+            $this->_entityManager->getConnection()->rollBack();
+            throw new ServiceException(ERROR_DB_MSG_TRANSACTION);
+        }
+
     }
 }
