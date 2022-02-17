@@ -2,12 +2,12 @@ API REST (Les habitues)
 
 
 
-Construire les dockers (ngnix,php et  mysql) avec le console
+1: Construire les dockers (ngnix,php et  mysql) avec le console
     docker-compose up -d –build
 
 
 
-Démarrer le projet Symfony (dossier app)
+2: Démarrer le projet Symfony (dossier app)
 
 •	Exécuter composer Install à l'intérieur du dossier app
 
@@ -20,6 +20,8 @@ Démarrer le projet Symfony (dossier app)
 
 •	Créer des fixtures avec le console
    php bin/console doctrine:fixtures:load
+
+3: lancer le projet http:localhost/api 
 
  
 
