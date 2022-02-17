@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 
 
-class PortefeuilleVoter extends Voter
+class TransactionVoter extends Voter
 {
     const EDIT = 'edit';
     const VIEW= 'view';
@@ -76,6 +76,7 @@ class PortefeuilleVoter extends Voter
 
     private function canView(Transaction $transaction, User $user): bool
     {
+        
         return  $user->hasRoles('ROLE_ADMIN') || $user === $transaction->getPortefeuille()->getClient();
     }
     private function canEdit(Transaction $transaction, User $user): bool
