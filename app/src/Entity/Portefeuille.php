@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PortefeuilleRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
@@ -15,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     collectionOperations: [
-        'get'=>["security"=>"is_granted('ROLE_ADMIN')"],
+        'get',
         'post'=>["security"=>"is_granted('ROLE_CLIENT')"],
     ],
     itemOperations: [
@@ -31,7 +33,7 @@ class Portefeuille
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'float')]
     #[Assert\PositiveOrZero]
     private $solde;
 
@@ -49,17 +51,25 @@ class Portefeuille
     #[ORM\Column(type: 'datetime_immutable')]
     private $updatedAt;
 
+    #[ORM\OneToMany(mappedBy: 'portefeuille', targetEntity: Transaction::class)]
+    private $transactions;
+
+    public function __construct()
+    {
+        $this->transactions = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getSolde(): ?int
+    public function getSolde(): ?float
     {
         return $this->solde;
     }
 
-    public function setSolde(int $solde): self
+    public function setSolde(float $solde): self
     {
         $this->solde = $solde;
 
@@ -124,11 +134,41 @@ class Portefeuille
             'message'=>  'ce client a déjà un portefeuill chez ce commerçant',
         ]));
 
-            // UniqueEntity validation
-            $metadata->addConstraint(new PositiveOrZero([
-                'fields'=> 'solde',
-                'message'=>  "Il n'est pas possible d'avoir un solde négatif",
-            ]));
+            // // UniqueEntity validation
+            // $metadata->addConstraint(new PositiveOrZero([
+            //     'fields'=> 'solde',
+            //     'message'=>  "Il n'est pas possible d'avoir un solde négatif",
+            // ]));
    
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transaction $transaction): self
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions[] = $transaction;
+            $transaction->setPortefeuille($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transaction $transaction): self
+    {
+        if ($this->transactions->removeElement($transaction)) {
+            // set the owning side to null (unless already changed)
+            if ($transaction->getPortefeuille() === $this) {
+                $transaction->setPortefeuille(null);
+            }
+        }
+
+        return $this;
     }
 }

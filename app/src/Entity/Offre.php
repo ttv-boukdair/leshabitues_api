@@ -79,7 +79,10 @@ class Offre
 
         return $this;
     }
-
+    public function getMontantAvecRemise(): ?float
+    {
+        return $this->remise+$this->montant;
+    }
 
 
     public function getIsPublished(): ?bool

@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 #[ApiResource(
     attributes: ['normalization_context' => ['groups' => ['read']],'denormalization_context' => ['groups' => ['write']]],
     collectionOperations: [
-        // 'get',
+      
         'get'=>["security"=>"is_granted('ROLE_ADMIN')"],
         //register new user
         'post',
@@ -74,11 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      #[Groups(['read', 'write'])]
     private $ville;
 
-    // #[ORM\OneToMany(mappedBy: 'commercant', targetEntity: Offre::class, orphanRemoval: true)]
-    // private $offres;
 
-    // #[ORM\OneToMany(mappedBy: 'commercant', targetEntity: Portefeuille::class)]
-    // private $portefeuillesClients;
 
     public function __construct()
     {

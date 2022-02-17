@@ -4,7 +4,7 @@
 namespace App\Security;
 
 use App\Entity\User;
-use App\Entity\Portefeuille;
+use App\Entity\Transaction;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -29,7 +29,7 @@ class PortefeuilleVoter extends Voter
             return false;
         }
 
-        if (!$subject instanceof Portefeuille) {
+        if (!$subject instanceof Transaction) {
             return false;
         }
 
@@ -58,27 +58,27 @@ class PortefeuilleVoter extends Voter
         }
 
       /**
-         * @var Portefeuille
+         * @var Transaction
          */
-        $portefeuille= $subject;
+        $transaction= $subject;
 
 
         switch ($attribute) {
             case self::VIEW:
-                return $this->canView( $portefeuille, $user);
+                return $this->canView( $transaction, $user);
             case self::EDIT:
-                return $this->canEdit( $portefeuille, $user);
+                return $this->canEdit( $transaction, $user);
         }
 
         throw new \LogicException('This code should not be reached!');
     }
 
 
-    private function canView(Portefeuille $portefeuille, User $user): bool
+    private function canView(Transaction $transaction, User $user): bool
     {
-        return  $user->hasRoles('ROLE_ADMIN') || $user === $portefeuille->getClient();
+        return  $user->hasRoles('ROLE_ADMIN') || $user === $transaction->getPortefeuille()->getClient();
     }
-    private function canEdit(Portefeuille $portefeuille, User $user): bool
+    private function canEdit(Transaction $transaction, User $user): bool
     {
         
         return $user->hasRoles('ROLE_ADMIN') ;
