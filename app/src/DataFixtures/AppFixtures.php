@@ -7,6 +7,9 @@ use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User;
 use App\Entity\Offre;
+use App\Entity\Portefeuille;
+
+
 class AppFixtures extends Fixture
 {
     private UserPasswordHasherInterface $hasher;
@@ -111,4 +114,24 @@ class AppFixtures extends Fixture
         $manager->persist($offre);
         }
     }
+
+
+    function generatePortefeuille(ObjectManager $manager)
+    {
+
+
+        //  find commercant
+        $user= new User();
+        $commercants= $manager->getRepository("App:User")->findByRole("ROLE_COMMERCANT");
+        $clients= $manager->getRepository("App:User")->findByRole("ROLE_CLIENT");
+
+        for ($i = 0; $i <  count($clients); $i++) {
+        $portefeuille= new Portefeuille();
+        $portefeuille->setCommercant($commercants[$i]);
+        $portefeuille->setClient($clients[$i]);
+        $portefeuille->setSolde(0);
+        $manager->persist($portefeuille);
+        }
+    }
+}
 }

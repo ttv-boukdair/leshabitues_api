@@ -10,6 +10,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: PortefeuilleRepository::class)]
 
 #[ApiResource(
@@ -31,6 +32,7 @@ class Portefeuille
     private $id;
 
     #[ORM\Column(type: 'integer')]
+    #[Assert\PositiveOrZero]
     private $solde;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -121,6 +123,12 @@ class Portefeuille
             'errorPath'=>  'commercant',
             'message'=>  'ce client a déjà un portefeuill chez ce commerçant',
         ]));
+
+            // UniqueEntity validation
+            $metadata->addConstraint(new PositiveOrZero([
+                'fields'=> 'solde',
+                'message'=>  "Il n'est pas possible d'avoir un solde négatif",
+            ]));
    
     }
 }
