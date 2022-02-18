@@ -14,6 +14,7 @@ API REST (Les habitues)
 •	Créer  la base de données
 
         php bin/console doctrine:database:create
+        php bin/console doctrine:migrations:migrate
 
 •	Générer la clé privé (JWT)
 
