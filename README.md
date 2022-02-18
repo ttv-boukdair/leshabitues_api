@@ -2,7 +2,8 @@ API REST (Les habitues)
 
 
 
-1: Construire les dockers (ngnix,php et  mysql) avec le console
+1: Construire les dockers (ngnix,php et mysql) 
+
     docker-compose up -d –build
 
 
@@ -14,7 +15,7 @@ API REST (Les habitues)
 
         php bin/console doctrine:database:create
 
-•	Générer de la clé privé (JWT)
+•	Générer la clé privé (JWT)
 
     mkdir -p config/jwt
     openssl genrsa -out config/jwt/private.pem -aes256 4096
@@ -23,14 +24,15 @@ API REST (Les habitues)
 
 •	Créer des fixtures avec le console (optionnel)
     php bin/console doctrine:fixtures:load
-  
-•	Créer et ahtentifier un utilisateur 
+
+
+3: lancer le projet 
+
+    (entry point) http:localhost/api 
+
+    pour Créer et authentifier un utilisateur 
 
     http:localhost/api/login  {email:,password:}
     http:localhost/api/users {email:,password:,role:[ "ROLE_CLIENT", "ROLE_COMMERCANT", "ROLE_ADMIN" ]}
-
-
-3: lancer le projet http:localhost/api 
-
  
 
