@@ -1,5 +1,5 @@
 <?php
-// src/DataPersister/UserDataPersister.php
+
 
 namespace App\DataPersister;
 
@@ -63,14 +63,14 @@ class TransactionDataPersister implements ContextAwareDataPersisterInterface
         $user=$this->_security->getUser();
 
     
-       // return 404 in type of trasanction is null
+       // return error if type of trasanction is null
        $type=$data->getType();
       if(null===$type) throw new InvalidArgumentException(self::ERROR_TYPE_MSG);
 
-       // return 404 if portefeuille is null
+       // return error if portefeuille is null
       if(null===$data->getPortefeuille()) throw new InvalidArgumentException(self::ERROR_PORTEFEUILLE_MSG_EMPTY);
 
-       // return 404 if portefeuille is not owned by the currente user or user with role Admin
+       // return error if portefeuille is not owned by the currente user or user with role Admin
        if($user!==$data->getPortefeuille()->getClient() )  throw new InvalidArgumentException(self::ERROR_PORTEFEUILLE_MSG_ACCESS_DENIED);
     
        // tracking dates
@@ -85,7 +85,7 @@ class TransactionDataPersister implements ContextAwareDataPersisterInterface
              $this->Debit( $data, $user);
              break;
         default:
-          // return 404 if type of trasanction is not credit or debit
+          // return error if type of trasanction is not credit or debit
         throw new InvalidArgumentException(self::ERROR_TYPE_MSG);
        }
     
